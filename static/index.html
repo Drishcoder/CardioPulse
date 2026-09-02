@@ -1,41 +1,440 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CardioPulse | Risk intelligence</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeartGuard | AI Heart Risk Predictor</title>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Plotly.js for Medical Analytics -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <!-- Three.js & GLTFLoader for 3D Beating Heart -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
-  <div class="app-shell">
+<body class="theme-obsidian-heart">
+  <div class="app-layout">
+    <!-- Left Navigation Sidebar -->
     <aside class="sidebar">
-      <div class="brand"><span class="brand-mark">+</span><span>Cardio<span class="brand-accent">Pulse</span></span></div>
-      <div class="sidebar-label">Workspace</div>
-      <nav>
-        <a class="nav-link active" href="#overview"><span class="nav-icon">◈</span> Overview</a>
-        <a class="nav-link" href="#assessment"><span class="nav-icon">⌁</span> Clinical Q&amp;A</a>
-        <a class="nav-link" href="/docs" target="_blank"><span class="nav-icon">⌘</span> API explorer</a>
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+            <path d="M12 6l0 4l2 1l2 -3l2 2l2 -1" stroke-width="1.8" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>HeartGuard</h2>
+          <p>AI Heart Risk Predictor</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="#assessment" class="nav-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+          <span>Health Assessment</span>
+        </a>
+        <a href="#results-view" class="nav-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Risk Prediction</span>
+        </a>
+        <a href="#analytics" class="nav-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          <span>Results &amp; Analytics</span>
+        </a>
+        <a href="#history" class="nav-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>History</span>
+        </a>
+        <a href="#tips" class="nav-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span>Health Tips</span>
+        </a>
+        <a href="#about" class="nav-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>About</span>
+        </a>
+        <a href="#logout" class="nav-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Logout</span>
+        </a>
       </nav>
+
       <div class="sidebar-footer">
-        <div class="status-dot"></div>
-        <div>
-          <strong>Model online</strong>
-          <small>heart_risk_model.pkl</small>
+        <div class="emergency-card">
+          <p class="emergency-label">Emergency</p>
+          <p class="emergency-sub">In case of a medical emergency</p>
+          <div class="emergency-call">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <strong>102 / 911</strong>
+          </div>
+        </div>
+
+        <div class="priority-card">
+          <div class="priority-text">
+            <span>Your health is</span>
+            <strong>Our Priority</strong>
+          </div>
+          <div class="priority-shield">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8a2 2 0 0 0-2 2c0 1.5 2 3 2 3s2-1.5 2-3a2 2 0 0 0-2-2z" fill="currentColor"/></svg>
+          </div>
         </div>
       </div>
     </aside>
 
-    <main class="main-content">
-      <header class="topbar"><div><p class="eyebrow">Clinical intelligence / 01</p><h1>Risk overview</h1></div><div class="topbar-meta"><span class="live-pill"><i></i> Live system</span><span class="date-label">September 2026</span></div></header>
-      <section class="hero-row" id="overview"><div><p class="hero-kicker">Cardiovascular screening</p><h2>Read the signal<br><em>before it escalates.</em></h2><p class="hero-copy">A focused view of model performance and patient-level risk assessment, built for an early conversation.</p></div><div class="hero-pulse"><div class="pulse-line"></div><span>MODEL STATUS <b>READY</b></span></div></section>
-      <section class="metric-grid" id="metrics"><article class="metric-card accent"><div class="metric-top"><span>Model accuracy</span><span class="metric-icon">↗</span></div><strong id="accuracy">--</strong><small>Across evaluation records</small></article><article class="metric-card"><div class="metric-top"><span>Precision</span><span class="metric-icon">◎</span></div><strong id="precision">--</strong><small>Positive predictions correct</small></article><article class="metric-card"><div class="metric-top"><span>Recall</span><span class="metric-icon">◌</span></div><strong id="recall">--</strong><small>At-risk cases identified</small></article><article class="metric-card"><div class="metric-top"><span>Evaluation set</span><span class="metric-icon">▦</span></div><strong id="records">--</strong><small>Patient records analyzed</small></article></section>
-      <section class="charts-section"><div class="section-intro"><div><p class="eyebrow">Interactive analytics</p><h3>Understand the model signal</h3></div><span>Hover, zoom, and filter the views</span></div><div class="chart-grid"><article class="panel chart-card"><h4>Observed class balance</h4><div id="class-balance-chart"></div></article><article class="panel chart-card"><h4>Confusion matrix</h4><div id="confusion-chart"></div></article><article class="panel chart-card wide"><h4>Feature prevalence by outcome</h4><div id="prevalence-chart"></div></article><article class="panel chart-card wide"><h4>Predicted probability distribution</h4><div id="probability-chart"></div></article></div></section><div class="content-grid"><section class="panel assessment-panel" id="assessment"><div class="panel-heading"><div><p class="eyebrow">Patient assessment</p><h3>Run a risk check</h3></div><span class="step-count">01 <i>/</i> 16 inputs</span></div><form id="risk-form"><div class="form-section"><div class="section-title"><span>01</span><div><b>Profile</b><small>Basic patient context</small></div></div><div class="field-row"><label>Age<input name="Age" type="number" min="1" max="120" value="48" required></label><label>Gender<select name="Gender"><option value="0">Female</option><option value="1">Male</option></select></label></div></div><div class="form-section"><div class="section-title"><span>02</span><div><b>Symptoms</b><small>Current clinical indicators</small></div></div><div class="toggle-grid" id="symptom-fields"></div></div><div class="form-section"><div class="section-title"><span>03</span><div><b>Health factors</b><small>Known history and lifestyle markers</small></div></div><div class="toggle-grid" id="factor-fields"></div></div><button class="submit-btn" type="submit"><span>Calculate risk profile</span><b>→</b></button></form></section><aside class="right-rail"><section class="panel result-panel"><div class="panel-heading"><div><p class="eyebrow">Latest result</p><h3 id="result-title">Awaiting assessment</h3></div><span class="result-badge" id="result-badge">READY</span></div><div class="gauge-wrap"><div class="gauge"><div class="gauge-inner"><strong id="risk-value">--</strong><span>risk probability</span></div></div></div><p class="result-note" id="result-note">Complete the patient profile to generate an individual risk signal.</p></section><section class="panel performance-panel"><div class="panel-heading"><div><p class="eyebrow">Model quality</p><h3>Performance snapshot</h3></div></div><div class="quality-row"><span>F1 score</span><b id="f1">--</b></div><div class="quality-row"><span>ROC-AUC</span><b id="roc_auc">--</b></div><div class="quality-row"><span>Positive rate</span><b id="positive_rate">--</b></div><div class="quality-bar"><span></span></div></section></aside></div><footer>CardioPulse is a decision-support interface, not a medical diagnosis. Always review results with a qualified clinician.</footer>
+    <!-- Main Workspace Area -->
+    <main class="main-content" id="dashboard">
+      <!-- Top Welcome Bar -->
+      <header class="top-header">
+        <div class="welcome-badge">
+          <div class="welcome-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </div>
+          <div class="welcome-text">
+            <strong>Welcome back,</strong>
+            <span>Take control of your heart health today.</span>
+          </div>
+        </div>
+
+        <div class="top-header-right">
+          <!-- Live Glow Preview Button -->
+          <button type="button" class="btn-glow-test" id="manual-glow-toggle" title="Toggle 3D Heart Green Disease Glow">
+            <span class="glow-indicator-dot"></span>
+            <span id="toggle-glow-label">Preview Disease Green Glow</span>
+          </button>
+
+          <div class="user-pill">
+            <div class="user-avatar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <span>User</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- Central Assessment Stage (Two Main Reference Panels) -->
+      <section class="assessment-stage-grid" id="assessment">
+        <!-- LEFT PANEL: 3D Anatomical Heart Visualization -->
+        <div class="card-panel heart-visualization-panel">
+          <div class="panel-header-block">
+            <h3>Heart Health Assessment</h3>
+            <p>Answer a few questions to predict your heart attack risk using AI</p>
+          </div>
+
+          <div class="heart-stage-wrapper" id="heart-canvas-wrap">
+            <!-- Background Glow Aura (Turns emerald green upon disease risk!) -->
+            <div class="heart-ambient-aura" id="heart-glow-aura"></div>
+
+            <div class="canvas-loading" id="heart-loading">
+              <div class="loading-spinner"></div>
+              <span>Loading 3D Beating Heart...</span>
+            </div>
+
+            <!-- Seamless 3D Canvas -->
+            <canvas id="heart-canvas"></canvas>
+
+            <!-- Anatomical Annotation Callouts (Just like reference design!) -->
+            <div class="anatomy-annotation pin-aorta">
+              <div class="anno-content">
+                <strong>Aorta <span class="anno-dot"></span></strong>
+                <p>Main artery that carries blood to the body</p>
+              </div>
+              <div class="anno-line line-aorta"></div>
+            </div>
+
+            <div class="anatomy-annotation pin-right-atrium">
+              <div class="anno-content">
+                <strong>Right Atrium <span class="anno-dot"></span></strong>
+                <p>Receives deoxygenated blood from the body</p>
+              </div>
+              <div class="anno-line line-right-atrium"></div>
+            </div>
+
+            <div class="anatomy-annotation pin-right-ventricle">
+              <div class="anno-content">
+                <strong>Right Ventricle <span class="anno-dot"></span></strong>
+                <p>Pumps blood to the lungs</p>
+              </div>
+              <div class="anno-line line-right-ventricle"></div>
+            </div>
+
+            <div class="anatomy-annotation pin-left-atrium">
+              <div class="anno-line line-left-atrium"></div>
+              <div class="anno-content">
+                <strong><span class="anno-dot"></span> Left Atrium</strong>
+                <p>Receives oxygenated blood from the lungs</p>
+              </div>
+            </div>
+
+            <div class="anatomy-annotation pin-left-ventricle">
+              <div class="anno-line line-left-ventricle"></div>
+              <div class="anno-content">
+                <strong><span class="anno-dot"></span> Left Ventricle</strong>
+                <p>Pumps oxygenated blood to the body</p>
+              </div>
+            </div>
+
+            <div class="anatomy-annotation pin-septum">
+              <div class="anno-line line-septum"></div>
+              <div class="anno-content">
+                <strong><span class="anno-dot"></span> Septum</strong>
+                <p>Wall separating left and right heart</p>
+              </div>
+            </div>
+
+            <!-- ECG Pulse Wave Overlay -->
+            <div class="ecg-waveform-strip">
+              <svg class="ecg-svg" viewBox="0 0 600 60" preserveAspectRatio="none">
+                <path d="M0,30 L100,30 L110,12 L120,48 L130,5 L140,55 L150,30 L220,30 L230,12 L240,48 L250,5 L260,55 L270,30 L340,30 L350,12 L360,48 L370,5 L380,55 L390,30 L480,30 L490,12 L500,48 L510,5 L520,55 L530,30 L600,30" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Bottom Importance Banner -->
+          <div class="importance-banner">
+            <div class="importance-text">
+              <h4>Why is this important?</h4>
+              <p>Early detection of heart disease can help prevent serious complications. This assessment uses machine learning to analyze your risk factors.</p>
+            </div>
+            <div class="importance-shield">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8a2 2 0 0 0-2 2c0 1.5 2 3 2 3s2-1.5 2-3a2 2 0 0 0-2-2z" fill="currentColor"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL: Health Questionnaire Card (Step-by-Step interactive Q&A) -->
+        <div class="card-panel questionnaire-panel">
+          <div class="panel-header-block">
+            <h3>Health Questionnaire</h3>
+            <div class="progress-row">
+              <span class="progress-label">Question <b id="curr-q-num">1</b> of <b id="total-q-num">16</b></span>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="questionnaire-progress-fill" style="width: 6%;"></div>
+              </div>
+              <span class="progress-pct" id="progress-percent-label">6%</span>
+            </div>
+          </div>
+
+          <!-- Main Active Question Area -->
+          <div class="question-stage-content" id="question-card-container">
+            <div class="question-icon-badge" id="q-icon-badge">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+              </svg>
+            </div>
+
+            <h4 class="active-question-title" id="q-title">Do you experience chest pain or discomfort?</h4>
+            <p class="active-question-desc" id="q-desc">This includes any pain, pressure, tightness, or heaviness in your chest.</p>
+
+            <!-- Custom Demographic Age/Gender Input (Only visible on Demographics step) -->
+            <div class="special-input-container hide" id="demographics-special-input">
+              <div class="demographic-stepper-wrap">
+                <label>Verified Chronological Age:</label>
+                <div class="stepper-box">
+                  <button type="button" class="btn-step" id="age-decrement">-</button>
+                  <input type="number" id="input-age" value="48" min="1" max="120">
+                  <button type="button" class="btn-step" id="age-increment">+</button>
+                  <span class="stepper-suffix">years old</span>
+                </div>
+                <div class="preset-chips">
+                  <button type="button" class="chip-btn" data-age="35">35</button>
+                  <button type="button" class="chip-btn" data-age="48">48</button>
+                  <button type="button" class="chip-btn" data-age="58">58</button>
+                  <button type="button" class="chip-btn" data-age="68">68</button>
+                </div>
+              </div>
+
+              <div class="gender-selector-wrap">
+                <label>Biological Sex:</label>
+                <div class="gender-segmented-row">
+                  <button type="button" class="gender-btn" data-gender="0" id="gender-btn-0">Female</button>
+                  <button type="button" class="gender-btn active" data-gender="1" id="gender-btn-1">Male</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Binary Yes / No Answer Cards (Exactly like reference design!) -->
+            <div class="answer-options-row" id="binary-answer-row">
+              <button type="button" class="answer-choice-card opt-yes" id="btn-answer-yes">
+                <span class="choice-text">Yes</span>
+                <span class="choice-icon check-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+              </button>
+
+              <button type="button" class="answer-choice-card opt-no active" id="btn-answer-no">
+                <span class="choice-text">No</span>
+                <span class="choice-icon x-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tips Guidance Box (Mirroring reference layout) -->
+          <div class="questionnaire-tips-card">
+            <div class="tip-icon-square">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.5 4.5 3 6h8c1.5-1.5 3-3.5 3-6a7 7 0 0 0-7-7z"/></svg>
+            </div>
+            <div class="tip-content">
+              <strong>Tips</strong>
+              <p id="tip-text">Be honest with your answers for accurate results. This information is kept private and secure.</p>
+            </div>
+            <div class="watermark-heart">
+              <svg viewBox="0 0 24 24" width="54" height="54" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+          </div>
+
+          <!-- Action Navigation Buttons -->
+          <div class="questionnaire-actions-bar">
+            <button type="button" class="btn-nav-prev" id="btn-prev-question" disabled>
+              <span>← Back</span>
+            </button>
+            <button type="button" class="btn-nav-next" id="btn-next-question">
+              <span id="next-btn-text">Next Question</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Quick Stats Row (4 Cards as in reference) -->
+      <section class="bottom-stats-grid">
+        <div class="stat-pill-card">
+          <div class="stat-icon-wrap">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/></svg>
+          </div>
+          <div class="stat-meta">
+            <span class="stat-title">AI Model</span>
+            <strong class="stat-value" id="stat-accuracy">98.2% Accuracy</strong>
+          </div>
+        </div>
+
+        <div class="stat-pill-card">
+          <div class="stat-icon-wrap">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+          </div>
+          <div class="stat-meta">
+            <span class="stat-title">Questions</span>
+            <strong class="stat-value">16 Comprehensive</strong>
+          </div>
+        </div>
+
+        <div class="stat-pill-card">
+          <div class="stat-icon-wrap">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="stat-meta">
+            <span class="stat-title">Assessment Time</span>
+            <strong class="stat-value">2-3 Minutes</strong>
+          </div>
+        </div>
+
+        <div class="stat-pill-card">
+          <div class="stat-icon-wrap">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/><path d="M3 20h18"/></svg>
+          </div>
+          <div class="stat-meta">
+            <span class="stat-title">Results</span>
+            <strong class="stat-value">Instant Analysis</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Outcome Modal / Results Slide-in Card -->
+      <section class="results-modal-container hide" id="results-view">
+        <div class="results-modal-card">
+          <div class="modal-header">
+            <div class="modal-badge-row">
+              <span class="modal-triage-badge" id="modal-risk-badge">EVALUATING</span>
+              <button type="button" class="btn-close-modal" id="btn-close-results">✕</button>
+            </div>
+            <h3 id="modal-risk-title">Cardiovascular Risk Signal</h3>
+            <p id="modal-risk-subtitle">Patient risk score generated using XGBoost clinical diagnostic inference.</p>
+          </div>
+
+          <div class="modal-body">
+            <div class="gauge-centerpiece">
+              <div class="gauge" id="result-gauge" style="--risk: 0deg;">
+                <div class="gauge-inner">
+                  <strong id="modal-risk-percentage">--%</strong>
+                  <span>Risk Probability</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-heart-sync-banner" id="modal-heart-sync-banner">
+              <div class="sync-dot"></div>
+              <p id="modal-heart-feedback-text">Anatomical heart is syncing with diagnostic risk telemetry...</p>
+            </div>
+
+            <div class="modal-metrics-summary">
+              <div class="m-stat">
+                <span>Model ROC-AUC</span>
+                <strong id="modal-roc-auc">99.9%</strong>
+              </div>
+              <div class="m-stat">
+                <span>Positive Findings</span>
+                <strong id="modal-findings-count">0 flags</strong>
+              </div>
+              <div class="m-stat">
+                <span>Heart Rhythm</span>
+                <strong id="modal-rhythm">72 BPM</strong>
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn-retest" id="btn-retake-test">Retake Assessment</button>
+              <a href="#analytics" class="btn-view-charts" id="btn-view-cohort">View Population Analytics ↓</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analytics Section (Plotly Charts) -->
+      <section class="charts-section" id="analytics">
+        <div class="section-intro">
+          <div>
+            <p class="eyebrow">Population Telemetry</p>
+            <h3>Clinical Model Signal &amp; Cohort Distribution</h3>
+          </div>
+          <span>Interactive exploratory views</span>
+        </div>
+        <div class="chart-grid">
+          <article class="card-panel chart-card">
+            <h4>Observed Class Balance</h4>
+            <div id="class-balance-chart"></div>
+          </article>
+          <article class="card-panel chart-card">
+            <h4>Confusion Matrix</h4>
+            <div id="confusion-chart"></div>
+          </article>
+          <article class="card-panel chart-card wide">
+            <h4>Feature Prevalence by Outcome</h4>
+            <div id="prevalence-chart"></div>
+          </article>
+          <article class="card-panel chart-card">
+            <h4>Risk Probability Distribution</h4>
+            <div id="probability-chart"></div>
+          </article>
+        </div>
+      </section>
     </main>
   </div>
+
   <script src="/static/app.js"></script>
 </body>
 </html>
