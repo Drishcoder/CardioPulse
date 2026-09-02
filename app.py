@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score, roc_auc_score
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "heart_risk_model.pkl"
@@ -34,7 +34,30 @@ def load_metrics() -> dict:
         "roc_auc": round(float(roc_auc_score(labels, probabilities) * 100), 2),
     }
 
+def load_chart_data() -> dict:
+    data = pd.read_csv(DATA_PATH)
+    features = data[FEATURES]
+    labels = data["Heart_Risk"].astype(int)
+    predictions = model.predict(features).astype(int)
+    probabilities = model.predict_proba(features)[:, 1]
+    binary_features = [feature for feature in FEATURES if feature != "Age"]
+    prevalence = data.groupby("Heart_Risk")[binary_features].mean().T.reset_index()
+    prevalence.columns = ["feature", "lower_risk", "heart_risk"]
+    matrix = confusion_matrix(labels, predictions).tolist()
+    probability_bins = pd.cut(probabilities * 100, bins=[0, 25, 50, 75, 100], include_lowest=True)
+    distribution = probability_bins.value_counts().sort_index()
+    return {
+        "class_balance": {"lower_risk": int((labels == 0).sum()), "heart_risk": int((labels == 1).sum())},
+        "prevalence": [
+            {"feature": row.feature.replace("_", " "), "lower_risk": round(float(row.lower_risk * 100), 2), "heart_risk": round(float(row.heart_risk * 100), 2)}
+            for row in prevalence.itertuples()
+        ],
+        "confusion_matrix": matrix,
+        "probability_distribution": {str(interval): int(count) for interval, count in distribution.items()},
+    }
+
 METRICS = load_metrics()
+CHART_DATA = load_chart_data()
 
 class RiskRequest(BaseModel):
     Chest_Pain: int = Field(ge=0, le=1)
@@ -68,6 +91,10 @@ def metrics() -> dict:
 @app.get("/api/health")
 def health() -> dict:
     return {"status": "ok", "model": MODEL_PATH.name, "features": len(FEATURES)}
+
+@app.get("/api/charts")
+def charts() -> dict:
+    return CHART_DATA
 
 @app.post("/api/predict")
 def predict(request: RiskRequest) -> dict:
