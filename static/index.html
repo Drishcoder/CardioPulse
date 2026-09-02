@@ -6,7 +6,7 @@
   <title>CardioPulse | Risk intelligence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -14,14 +14,242 @@
     <aside class="sidebar">
       <div class="brand"><span class="brand-mark">+</span><span>Cardio<span class="brand-accent">Pulse</span></span></div>
       <div class="sidebar-label">Workspace</div>
-      <nav><a class="nav-link active" href="#overview"><span class="nav-icon">◈</span> Overview</a><a class="nav-link" href="#assessment"><span class="nav-icon">⌁</span> New assessment</a><a class="nav-link" href="/docs" target="_blank"><span class="nav-icon">⌘</span> API explorer</a></nav>
-      <div class="sidebar-footer"><div class="status-dot"></div><div><strong>Model online</strong><small>heart_risk_model.pkl</small></div></div>
+      <nav>
+        <a class="nav-link active" href="#overview"><span class="nav-icon">◈</span> Overview</a>
+        <a class="nav-link" href="#assessment"><span class="nav-icon">⌁</span> Clinical Q&amp;A</a>
+        <a class="nav-link" href="/docs" target="_blank"><span class="nav-icon">⌘</span> API explorer</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="status-dot"></div>
+        <div>
+          <strong>Model online</strong>
+          <small>heart_risk_model.pkl</small>
+        </div>
+      </div>
     </aside>
+
     <main class="main-content">
-      <header class="topbar"><div><p class="eyebrow">Clinical intelligence / 01</p><h1>Risk overview</h1></div><div class="topbar-meta"><span class="live-pill"><i></i> Live system</span><span class="date-label">September 2026</span></div></header>
-      <section class="hero-row" id="overview"><div><p class="hero-kicker">Cardiovascular screening</p><h2>Read the signal<br><em>before it escalates.</em></h2><p class="hero-copy">A focused view of model performance and patient-level risk assessment, built for an early conversation.</p></div><div class="hero-pulse"><div class="pulse-line"></div><span>MODEL STATUS <b>READY</b></span></div></section>
-      <section class="metric-grid" id="metrics"><article class="metric-card accent"><div class="metric-top"><span>Model accuracy</span><span class="metric-icon">↗</span></div><strong id="accuracy">--</strong><small>Across evaluation records</small></article><article class="metric-card"><div class="metric-top"><span>Precision</span><span class="metric-icon">◎</span></div><strong id="precision">--</strong><small>Positive predictions correct</small></article><article class="metric-card"><div class="metric-top"><span>Recall</span><span class="metric-icon">◌</span></div><strong id="recall">--</strong><small>At-risk cases identified</small></article><article class="metric-card"><div class="metric-top"><span>Evaluation set</span><span class="metric-icon">▦</span></div><strong id="records">--</strong><small>Patient records analyzed</small></article></section>
-      <div class="content-grid"><section class="panel assessment-panel" id="assessment"><div class="panel-heading"><div><p class="eyebrow">Patient assessment</p><h3>Run a risk check</h3></div><span class="step-count">01 <i>/</i> 16 inputs</span></div><form id="risk-form"><div class="form-section"><div class="section-title"><span>01</span><div><b>Profile</b><small>Basic patient context</small></div></div><div class="field-row"><label>Age<input name="Age" type="number" min="1" max="120" value="48" required></label><label>Gender<select name="Gender"><option value="0">Female</option><option value="1">Male</option></select></label></div></div><div class="form-section"><div class="section-title"><span>02</span><div><b>Symptoms</b><small>Current clinical indicators</small></div></div><div class="toggle-grid" id="symptom-fields"></div></div><div class="form-section"><div class="section-title"><span>03</span><div><b>Health factors</b><small>Known history and lifestyle markers</small></div></div><div class="toggle-grid" id="factor-fields"></div></div><button class="submit-btn" type="submit"><span>Calculate risk profile</span><b>→</b></button></form></section><aside class="right-rail"><section class="panel result-panel"><div class="panel-heading"><div><p class="eyebrow">Latest result</p><h3 id="result-title">Awaiting assessment</h3></div><span class="result-badge" id="result-badge">READY</span></div><div class="gauge-wrap"><div class="gauge"><div class="gauge-inner"><strong id="risk-value">--</strong><span>risk probability</span></div></div></div><p class="result-note" id="result-note">Complete the patient profile to generate an individual risk signal.</p></section><section class="panel performance-panel"><div class="panel-heading"><div><p class="eyebrow">Model quality</p><h3>Performance snapshot</h3></div></div><div class="quality-row"><span>F1 score</span><b id="f1">--</b></div><div class="quality-row"><span>ROC-AUC</span><b id="roc_auc">--</b></div><div class="quality-row"><span>Positive rate</span><b id="positive_rate">--</b></div><div class="quality-bar"><span></span></div></section></aside></div><footer>CardioPulse is a decision-support interface, not a medical diagnosis. Always review results with a qualified clinician.</footer>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Clinical intelligence / 01</p>
+          <h1>Risk overview</h1>
+        </div>
+        <div class="topbar-meta">
+          <span class="live-pill"><i></i> Live system</span>
+          <span class="date-label">September 2026</span>
+        </div>
+      </header>
+
+      <section class="hero-row" id="overview">
+        <div>
+          <p class="hero-kicker">Cardiovascular screening</p>
+          <h2>Read the signal<br><em>before it escalates.</em></h2>
+          <p class="hero-copy">An interactive clinical questionnaire and predictive risk assessment interface tailored for proactive cardiac evaluation.</p>
+        </div>
+        <div class="hero-pulse">
+          <div class="pulse-line"></div>
+          <span>MODEL STATUS <b>READY</b></span>
+        </div>
+      </section>
+
+      <section class="metric-grid" id="metrics">
+        <article class="metric-card accent">
+          <div class="metric-top"><span>Model accuracy</span><span class="metric-icon">↗</span></div>
+          <strong id="accuracy">--</strong>
+          <small>Across evaluation records</small>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>Precision</span><span class="metric-icon">◎</span></div>
+          <strong id="precision">--</strong>
+          <small>Positive predictions correct</small>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>Recall</span><span class="metric-icon">◌</span></div>
+          <strong id="recall">--</strong>
+          <small>At-risk cases identified</small>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>Evaluation set</span><span class="metric-icon">▦</span></div>
+          <strong id="records">--</strong>
+          <small>Patient records analyzed</small>
+        </article>
+      </section>
+
+      <div class="content-grid">
+        <!-- Assessment Section with Q&A Layout -->
+        <section class="panel assessment-panel" id="assessment">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Clinical questionnaire</p>
+              <h3>Patient Health Q&amp;A</h3>
+            </div>
+            <span class="step-count"><span id="answered-count">0</span> <i>/</i> 16 answered</span>
+          </div>
+
+          <form id="risk-form">
+            <div class="qna-workspace">
+              <!-- Left Column: Questions List -->
+              <div class="qna-flow">
+                <!-- Group 1: Demographics -->
+                <div class="form-section">
+                  <div class="section-title">
+                    <span>01</span>
+                    <div>
+                      <b>Patient Demographics</b>
+                      <small>Baseline biological parameters</small>
+                    </div>
+                  </div>
+                  <div class="qna-list" id="demographic-questions">
+                    <!-- Age card -->
+                    <div class="qna-card active" data-feature="Age" tabindex="0">
+                      <div class="qna-card-main">
+                        <div class="qna-header">
+                          <span class="qna-badge">Demographics</span>
+                          <span class="qna-number">Q1</span>
+                        </div>
+                        <h4 class="qna-title">What is the patient's age?</h4>
+                        <p class="qna-desc">Enter the patient's current age in years.</p>
+                        <div class="qna-input-wrap">
+                          <input type="number" id="input-age" name="Age" min="1" max="120" value="48" required class="qna-number-input">
+                          <span class="input-unit">years old</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Gender card -->
+                    <div class="qna-card" data-feature="Gender" tabindex="0">
+                      <div class="qna-card-main">
+                        <div class="qna-header">
+                          <span class="qna-badge">Demographics</span>
+                          <span class="qna-number">Q2</span>
+                        </div>
+                        <h4 class="qna-title">What is the patient's biological sex?</h4>
+                        <p class="qna-desc">Biological sex influences cardiovascular risk epidemiology.</p>
+                        <div class="qna-segmented-options">
+                          <label class="qna-radio-label">
+                            <input type="radio" name="Gender" value="0">
+                            <span class="qna-pill-btn">Female</span>
+                          </label>
+                          <label class="qna-radio-label">
+                            <input type="radio" name="Gender" value="1" checked>
+                            <span class="qna-pill-btn">Male</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Group 2: Clinical Symptoms -->
+                <div class="form-section">
+                  <div class="section-title">
+                    <span>02</span>
+                    <div>
+                      <b>Symptom Screening</b>
+                      <small>Current or recurring physical warning indicators</small>
+                    </div>
+                  </div>
+                  <div class="qna-list" id="symptom-questions">
+                    <!-- Populated dynamically via app.js -->
+                  </div>
+                </div>
+
+                <!-- Group 3: Health Factors & History -->
+                <div class="form-section">
+                  <div class="section-title">
+                    <span>03</span>
+                    <div>
+                      <b>Medical History &amp; Lifestyle</b>
+                      <small>Cardiovascular risk factors, lifestyle habits &amp; heredity</small>
+                    </div>
+                  </div>
+                  <div class="qna-list" id="factor-questions">
+                    <!-- Populated dynamically via app.js -->
+                  </div>
+                </div>
+
+                <div class="form-action-row">
+                  <button class="submit-btn" type="submit">
+                    <span>Calculate Risk Profile</span>
+                    <b>→</b>
+                  </button>
+                  <button class="reset-btn" type="button" id="reset-qna-btn">Reset All Answers</button>
+                </div>
+              </div>
+
+              <!-- Right Aside Column: Clinical Guidance & Question Details -->
+              <aside class="qna-aside" id="qna-aside-guide">
+                <div class="aside-sticky-card">
+                  <div class="aside-header">
+                    <span class="aside-tag" id="guide-category">Clinical Guidance</span>
+                    <span class="aside-impact-pill" id="guide-impact">Primary Indicator</span>
+                  </div>
+                  <h4 class="aside-title" id="guide-title">Do you experience chest pain, pressure, or tightness?</h4>
+                  <p class="aside-subtitle" id="guide-subtitle">Evaluates myocardial ischemia and coronary artery stress signals.</p>
+                  
+                  <div class="aside-section">
+                    <h5 class="aside-section-title">Clinical Context &amp; Significance</h5>
+                    <p class="aside-body" id="guide-description">
+                      Chest pain (angina) is the hallmark symptom of reduced blood flow to the heart muscle. It can feel like pressure, squeezing, fullness, or aching in the center of the chest.
+                    </p>
+                  </div>
+
+                  <div class="aside-section" id="guide-signs-box">
+                    <h5 class="aside-section-title">Signs to Look For</h5>
+                    <ul class="aside-signs-list" id="guide-signs">
+                      <li>Pressure, squeezing, or burning in the chest</li>
+                      <li>Pain exacerbated by exertion or emotional stress</li>
+                      <li>Discomfort relieved by rest or nitroglycerin</li>
+                    </ul>
+                  </div>
+
+                  <div class="aside-tip-box">
+                    <strong>When to answer "Yes":</strong>
+                    <span id="guide-tip">Select "Yes" if the patient has had recurrent episodes or persistent unexplained chest discomfort.</span>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </form>
+        </section>
+
+        <!-- Right Rail: Risk Prediction & Quality -->
+        <aside class="right-rail">
+          <section class="panel result-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Assessment outcome</p>
+                <h3 id="result-title">Awaiting assessment</h3>
+              </div>
+              <span class="result-badge" id="result-badge">READY</span>
+            </div>
+            <div class="gauge-wrap">
+              <div class="gauge">
+                <div class="gauge-inner">
+                  <strong id="risk-value">--</strong>
+                  <span>risk probability</span>
+                </div>
+              </div>
+            </div>
+            <p class="result-note" id="result-note">Complete the patient Q&amp;A questions to calculate personalized cardiovascular risk probability.</p>
+          </section>
+
+          <section class="panel performance-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Model quality</p>
+                <h3>Performance snapshot</h3>
+              </div>
+            </div>
+            <div class="quality-row"><span>F1 score</span><b id="f1">--</b></div>
+            <div class="quality-row"><span>ROC-AUC</span><b id="roc_auc">--</b></div>
+            <div class="quality-row"><span>Positive rate</span><b id="positive_rate">--</b></div>
+            <div class="quality-bar"><span></span></div>
+          </section>
+        </aside>
+      </div>
+
+      <footer>CardioPulse is a clinical decision-support interface, not a standalone medical diagnosis. Always review findings with a certified clinician.</footer>
     </main>
   </div>
   <script src="/static/app.js"></script>
