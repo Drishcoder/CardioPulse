@@ -1,4 +1,5 @@
 from pathlib import Path
+import math
 import pickle
 
 import pandas as pd
@@ -6,7 +7,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score, roc_auc_score, roc_curve
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "heart_risk_model.pkl"
@@ -40,6 +41,9 @@ def load_chart_data() -> dict:
     labels = data["Heart_Risk"].astype(int)
     predictions = model.predict(features).astype(int)
     probabilities = model.predict_proba(features)[:, 1]
+    false_positive_rate, true_positive_rate, _ = roc_curve(labels, probabilities)
+    sigmoid_x = [-6 + (12 * index / 60) for index in range(61)]
+    sigmoid_y = [1 / (1 + math.exp(-value)) for value in sigmoid_x]
     binary_features = [feature for feature in FEATURES if feature != "Age"]
     prevalence = data.groupby("Heart_Risk")[binary_features].mean().T.reset_index()
     prevalence.columns = ["feature", "lower_risk", "heart_risk"]
@@ -54,6 +58,11 @@ def load_chart_data() -> dict:
         ],
         "confusion_matrix": matrix,
         "probability_distribution": {str(interval): int(count) for interval, count in distribution.items()},
+        "roc_curve": {
+            "false_positive_rate": [round(float(value), 4) for value in false_positive_rate],
+            "true_positive_rate": [round(float(value), 4) for value in true_positive_rate],
+        },
+        "sigmoid_curve": {"x": sigmoid_x, "y": [round(value, 4) for value in sigmoid_y]},
     }
 
 METRICS = load_metrics()

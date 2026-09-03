@@ -553,6 +553,8 @@ function displayResultsModal(result) {
   const percentText = document.getElementById("modal-risk-percentage");
   const gauge = document.getElementById("result-gauge");
   const findingsCount = document.getElementById("modal-findings-count");
+  const recommendation = document.getElementById("clinical-recommendation");
+  const recommendationText = document.getElementById("clinical-recommendation-text");
 
   // Count positive findings
   let flags = 0;
@@ -575,6 +577,13 @@ function displayResultsModal(result) {
     subtitle.textContent = isHighRisk
       ? `Model flagged elevated cardiovascular pattern (${result.risk_probability}% risk probability). Coronary evaluation recommended.`
       : `Model detected no elevated cardiovascular risk signal (${result.risk_probability}% risk probability). Sinus rhythm preserved.`;
+  }
+
+  if (recommendation && recommendationText) {
+    recommendation.className = `clinical-recommendation ${isHighRisk ? "warning" : "good"}`;
+    recommendationText.textContent = isHighRisk
+      ? "Arrange a prompt appointment with a qualified healthcare professional to review these findings and discuss appropriate cardiovascular evaluation. If you have chest pain, severe breathlessness, fainting, or other urgent symptoms, seek emergency care immediately."
+      : "Continue routine preventive care, including regular check-ups, physical activity, a heart-healthy diet, and discussion of personal risk factors with your healthcare professional."
   }
 
   if (percentText) {
@@ -604,9 +613,19 @@ async function loadMetrics() {
     const metrics = await response.json();
     const statAcc = document.getElementById("stat-accuracy");
     const modalAuc = document.getElementById("modal-roc-auc");
+    const metricTargets = {
+      accuracy: document.getElementById("analysis-accuracy"),
+      precision: document.getElementById("analysis-precision"),
+      recall: document.getElementById("analysis-recall"),
+      f1: document.getElementById("analysis-f1"),
+      roc_auc: document.getElementById("analysis-roc-auc")
+    };
 
     if (statAcc) statAcc.textContent = `${metrics.accuracy}% Accuracy`;
     if (modalAuc) modalAuc.textContent = `${metrics.roc_auc}%`;
+    Object.entries(metricTargets).forEach(([key, element]) => {
+      if (element) element.textContent = `${metrics[key]}%`;
+    });
   } catch (err) {
     console.error("Metrics loading error:", err);
   }
@@ -709,6 +728,40 @@ async function loadCharts() {
         yaxis: { title: "Records", gridcolor: "rgba(230, 57, 70, 0.12)" },
         showlegend: false
       },
+      chartConfig
+    );
+
+    Plotly.newPlot(
+      "roc-chart",
+      [{
+        x: charts.roc_curve.false_positive_rate,
+        y: charts.roc_curve.true_positive_rate,
+        type: "scatter",
+        mode: "lines",
+        line: { color: "#ff4d6d", width: 3 },
+        fill: "tozeroy",
+        fillcolor: "rgba(255, 77, 109, 0.12)",
+        hovertemplate: "False positive: %{x:.2f}<br>True positive: %{y:.2f}<extra></extra>"
+      }, {
+        x: [0, 1], y: [0, 1], type: "scatter", mode: "lines",
+        line: { color: "rgba(255,255,255,0.22)", dash: "dot" },
+        hoverinfo: "skip", showlegend: false
+      }],
+      { ...chartLayout, xaxis: { title: "False positive rate", range: [0, 1], gridcolor: "rgba(230, 57, 70, 0.12)" }, yaxis: { title: "True positive rate", range: [0, 1], gridcolor: "rgba(230, 57, 70, 0.12)" }, showlegend: false },
+      chartConfig
+    );
+
+    Plotly.newPlot(
+      "sigmoid-chart",
+      [{
+        x: charts.sigmoid_curve.x,
+        y: charts.sigmoid_curve.y,
+        type: "scatter",
+        mode: "lines",
+        line: { color: "#2ec4b6", width: 3 },
+        hovertemplate: "Model score: %{x:.1f}<br>Probability: %{y:.0%}<extra></extra>"
+      }],
+      { ...chartLayout, xaxis: { title: "Model score (log-odds)", gridcolor: "rgba(230, 57, 70, 0.12)" }, yaxis: { title: "Predicted probability", tickformat: ".0%", range: [0, 1], gridcolor: "rgba(230, 57, 70, 0.12)" }, showlegend: false },
       chartConfig
     );
   } catch (err) {
