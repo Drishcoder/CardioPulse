@@ -87,6 +87,16 @@ class RiskRequest(BaseModel):
     Age: float = Field(ge=1, le=120)
 
 app = FastAPI(title="CardioPulse Risk API", version="1.0.0")
+
+@app.middleware("http")
+async def disable_frontend_cache(request, call_next):
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 @app.get("/", include_in_schema=False)

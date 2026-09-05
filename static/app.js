@@ -769,6 +769,28 @@ async function loadCharts() {
   }
 }
 
+function setupSectionNavigation() {
+  const navItems = document.querySelectorAll(".sidebar-nav .nav-item");
+  const sections = document.querySelectorAll("#dashboard, #assessment, #results-view, #analytics");
+
+  navItems.forEach((item) => {
+    item.addEventListener("click", (event) => {
+      const targetSelector = item.getAttribute("href");
+      const target = targetSelector ? document.querySelector(targetSelector) : null;
+
+      navItems.forEach((navItem) => navItem.classList.remove("active"));
+      sections.forEach((section) => section.classList.remove("nav-highlight"));
+
+      if (target) {
+        event.preventDefault();
+        item.classList.add("active");
+        target.classList.add("nav-highlight");
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  });
+}
+
 // ==========================================
 // Initialization & Event Listeners
 // ==========================================
@@ -869,6 +891,8 @@ document.addEventListener("DOMContentLoaded", () => {
       renderCurrentQuestion();
     });
   }
+
+  setupSectionNavigation();
 
   // 9. Load metrics & cohort charts
   loadMetrics();

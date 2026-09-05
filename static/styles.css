@@ -146,7 +146,7 @@ body.theme-obsidian-heart {
   color: #ffffff;
   background: linear-gradient(90deg, rgba(230, 57, 70, 0.22) 0%, rgba(164, 19, 60, 0.12) 100%);
   border: 1px solid rgba(255, 77, 109, 0.35);
-  box-shadow: 0 2px 12px rgba(230, 57, 70, 0.15);
+  box-shadow: 0 0 14px rgba(255, 77, 109, 0.45), inset 0 0 10px rgba(230, 57, 70, 0.12);
 }
 
 .nav-item svg {
@@ -643,6 +643,10 @@ body.theme-obsidian-heart {
 .question-stage-content {
   margin: 14px 0;
   flex: 1;
+}
+
+.hide {
+  display: none !important;
 }
 
 .question-icon-badge {
@@ -1315,6 +1319,13 @@ body.theme-obsidian-heart {
   margin-top: 24px;
   border-top: 1px solid var(--border-subtle);
   padding-top: 30px;
+}
+
+.nav-highlight {
+  border-color: var(--heart-neon) !important;
+  outline: 1px solid var(--heart-neon);
+  outline-offset: 4px;
+  box-shadow: 0 0 22px rgba(255, 77, 109, 0.5), inset 0 0 16px rgba(230, 57, 70, 0.12);
 }
 
 .section-intro {
