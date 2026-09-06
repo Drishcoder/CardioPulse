@@ -9,6 +9,7 @@ let diseasePointLight, rubyPointLight, keyLight;
 let isDiseaseActive = false;
 let currentBPM = 72;
 let modelBaseScale = 1.0;
+const API_BASE = "http://127.0.0.1:8000";
 
 // Clinical Questionnaire Database (16 Parameters corresponding to trained ML model)
 const questionList = [
@@ -525,13 +526,22 @@ async function runCardiovascularInference() {
   const payload = { ...patientResponses };
 
   try {
-    const res = await fetch("/api/predict", {
+    const res = await fetch(`${API_BASE}/api/predict`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
-    if (!res.ok) throw new Error("Diagnostic prediction failed");
+    if (!res.ok) {
+      let detail = "Diagnostic prediction failed";
+      try {
+        const errorBody = await res.json();
+        if (errorBody.detail) detail = errorBody.detail;
+      } catch {
+        // Keep the generic message when the server does not return JSON.
+      }
+      throw new Error(detail);
+    }
     const data = await res.json();
     displayResultsModal(data);
   } catch (err) {
@@ -609,7 +619,7 @@ function displayResultsModal(result) {
 // ==========================================
 async function loadMetrics() {
   try {
-    const response = await fetch("/api/metrics");
+    const response = await fetch(`${API_BASE}/api/metrics`);
     const metrics = await response.json();
     const statAcc = document.getElementById("stat-accuracy");
     const modalAuc = document.getElementById("modal-roc-auc");
@@ -643,7 +653,7 @@ const chartConfig = { responsive: true, displaylogo: false, modeBarButtonsToRemo
 
 async function loadCharts() {
   try {
-    const response = await fetch("/api/charts");
+    const response = await fetch(`${API_BASE}/api/charts`);
     const charts = await response.json();
 
     Plotly.newPlot(
