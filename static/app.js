@@ -9,7 +9,7 @@ let diseasePointLight, rubyPointLight, keyLight;
 let isDiseaseActive = false;
 let currentBPM = 72;
 let modelBaseScale = 1.0;
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = window.location.origin;
 
 // Clinical Questionnaire Database (16 Parameters corresponding to trained ML model)
 const questionList = [
