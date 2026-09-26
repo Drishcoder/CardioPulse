@@ -1,13 +1,16 @@
 from pathlib import Path
 import math
+import os
 import pickle
 
 import pandas as pd
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score, roc_auc_score, roc_curve
+import uvicorn
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "heart_risk_model.pkl"
@@ -88,6 +91,18 @@ class RiskRequest(BaseModel):
 
 app = FastAPI(title="CardioPulse Risk API", version="1.0.0")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+    ],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
+
 @app.middleware("http")
 async def disable_frontend_cache(request, call_next):
     response = await call_next(request)
@@ -129,3 +144,11 @@ def predict(request: RiskRequest) -> dict:
         }
     except Exception as error:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {error}") from error
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", "8000")),
+    )
