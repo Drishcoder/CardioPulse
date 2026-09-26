@@ -484,8 +484,9 @@ body.theme-obsidian-heart {
   position: absolute;
   z-index: 8;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+  max-width: 180px;
   pointer-events: none;
 }
 
@@ -493,6 +494,7 @@ body.theme-obsidian-heart {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  max-width: 150px;
 }
 
 .anno-content strong {
@@ -507,7 +509,7 @@ body.theme-obsidian-heart {
 .anno-content p {
   font-size: 10.5px;
   color: var(--text-muted);
-  max-width: 140px;
+  max-width: 120px;
   line-height: 1.25;
 }
 
@@ -524,17 +526,59 @@ body.theme-obsidian-heart {
 .anno-line {
   height: 1px;
   background: rgba(255, 77, 109, 0.4);
-  width: 34px;
+  width: 28px;
+  flex-shrink: 0;
+  margin-top: 7px;
 }
 
 /* Callout Positions */
-.pin-aorta { top: 22%; left: 4%; }
-.pin-right-atrium { top: 46%; left: 4%; }
-.pin-right-ventricle { top: 70%; left: 4%; }
+.pin-aorta { top: 16%; left: 7%; }
+.pin-right-atrium { top: 40%; left: 2%; }
+.pin-right-ventricle { top: 64%; left: 8%; }
 
-.pin-left-atrium { top: 26%; right: 4%; }
-.pin-left-ventricle { top: 52%; right: 4%; }
-.pin-septum { top: 76%; right: 4%; }
+.pin-left-atrium { top: 16%; right: 7%; }
+.pin-left-ventricle { top: 42%; right: 2%; }
+.pin-septum { top: 68%; right: 8%; }
+
+@media (max-width: 1200px) {
+  .heart-stage-wrapper {
+    height: 330px;
+  }
+
+  .anatomy-annotation {
+    max-width: 150px;
+  }
+
+  .anno-content strong {
+    font-size: 11px;
+  }
+
+  .anno-content p {
+    font-size: 9.5px;
+    max-width: 108px;
+  }
+
+  .anno-line {
+    width: 18px;
+  }
+}
+
+@media (max-width: 900px) {
+  .heart-stage-wrapper {
+    height: 300px;
+  }
+
+  .anatomy-annotation {
+    max-width: 132px;
+  }
+
+  .pin-aorta { top: 16%; left: 4%; }
+  .pin-right-atrium { top: 40%; left: 1%; }
+  .pin-right-ventricle { top: 66%; left: 6%; }
+  .pin-left-atrium { top: 16%; right: 4%; }
+  .pin-left-ventricle { top: 42%; right: 1%; }
+  .pin-septum { top: 70%; right: 6%; }
+}
 
 /* ECG Waveform Overlay */
 .ecg-waveform-strip {
